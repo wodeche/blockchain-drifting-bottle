@@ -114,13 +114,6 @@ export default function ThrowBottle() {
     }
   };
 
-  // 添加调试按钮
-  const debugThrow = async () => {
-    console.log('当前内容:', content);
-    console.log('目标地址:', targetAddress);
-    console.log('发送者地址:', address);
-  };
-
   return (
     <div className="throw-bottle">
       <h2>投放漂流瓶</h2>
@@ -153,13 +146,6 @@ export default function ThrowBottle() {
         disabled={isLoading || content.length === 0}
       >
         {isLoading ? '投放中...' : '投放漂流瓶'}
-      </button>
-
-      <button 
-        onClick={debugThrow}
-        disabled={isLoading || content.length === 0}
-      >
-        {isLoading ? '调试中...' : '调试投放'}
       </button>
     </div>
   );

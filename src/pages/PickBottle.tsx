@@ -33,14 +33,6 @@ interface DecodedEvent {
   };
 }
 
-// 添加类型定义
-interface BottleDetails {
-  id: string;
-  sender: string;
-  isPicked: boolean;
-  picker: string;
-}
-
 // 添加合约返回的漂流瓶类型
 interface ContractBottle {
   id: string;
@@ -53,23 +45,9 @@ interface ContractBottle {
 }
 
 // 添加类型定义
-interface DebugTargetedResult {
-  indices: bigint[];
-  isPicked: boolean[];
-  targetReceivers: string[];
-}
-
-// 添加类型定义
-interface BottleTargetResult {
-  bottleTarget: string;
-  isPicked: boolean;
-  currentUser: string;
-}
-
-// 添加类型定义
 interface TargetedCountResult {
-  count: bigint;
-  debugMessages: string[];
+  0: bigint;
+  1: string[];
 }
 
 export default function PickBottle() {
@@ -88,10 +66,6 @@ export default function PickBottle() {
     abi: CONTRACT_ABI,
     functionName: 'getAvailableBottleCount',
     watch: true,
-    onSuccess(data) {
-      console.log('Available bottles raw:', data); // 添加原始数据日志
-      console.log('Available bottles number:', Number(data));
-    },
     onError(error) {
       console.error('Error getting available count:', error);
     }
@@ -117,9 +91,6 @@ export default function PickBottle() {
     abi: CONTRACT_ABI,
     functionName: 'getBottleCount',
     watch: true,
-    onSuccess(data) {
-      console.log('Total bottles:', data);
-    }
   }) as { data: number };
 
   // 获取指定给我的漂流瓶数量
@@ -127,17 +98,12 @@ export default function PickBottle() {
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     functionName: 'getMyTargetedBottleCount',
-    args: [userAddress],  // 传入用户地址作为参数
+    args: [userAddress],
     enabled: !!userAddress,
-    onSuccess(data: [bigint, string[]]) {
-      console.log('未捞取的指定漂流瓶数量:', Number(data[0]));
-      console.log('调试消息:', data[1]);
-      console.log('使用的账户地址:', userAddress);
-    },
     onError(error) {
       console.error('Error getting targeted count:', error);
     }
-  });
+  }) as { data: TargetedCountResult, refetch: () => void };
 
   // 随机捞取漂流瓶
   const { 
@@ -278,126 +244,6 @@ export default function PickBottle() {
     }
   };
 
-  // 添加调试按钮
-  const debugBottles = async () => {
-    const total = Number(totalCount || 0);
-    console.log('Total bottles:', total);
-    
-    for (let i = 0; i < total; i++) {
-      try {
-        const result = await readContract({
-          address: CONTRACT_ADDRESS,
-          abi: CONTRACT_ABI,
-          functionName: 'getBottleDetails',
-          args: [i],
-        }) as [string, string, boolean, string]; // 添加类型断言
-
-        console.log(`Bottle ${i}:`, {
-          id: result[0],
-          sender: result[1],
-          isPicked: result[2],
-          picker: result[3]
-        } as BottleDetails);
-      } catch (error) {
-        console.error(`Error getting bottle ${i}:`, error);
-      }
-    }
-  };
-
-  // 在组件顶部添加调试日志
-  useEffect(() => {
-    console.log('Current availableCount:', availableCount);
-    console.log('Button should be disabled:', !availableCount);
-  }, [availableCount]);
-
-  // 手动获取可用数量
-  const checkAvailableBottles = async () => {
-    try {
-      const result = await readContract({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'getAvailableBottleCount',
-      });
-      console.log('Manual check available bottles:', result);
-    } catch (error) {
-      console.error('Manual check error:', error);
-    }
-  };
-
-  // 在组件加载和每次状态变化时检查
-  useEffect(() => {
-    checkAvailableBottles();
-  }, []);
-
-  // 添加 bottle 状态变化的监听
-  useEffect(() => {
-    console.log('漂流瓶状态更新:', bottle);
-  }, [bottle]);
-
-  // 修改调试函数
-  const debugTargetedBottles = async () => {
-    if (!userAddress) {
-      console.error('No account connected');
-      return;
-    }
-
-    try {
-      const data = await readContract({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'getMyTargetedBottleCount',
-        args: [userAddress],
-      }) as [bigint, string[]];
-      
-      console.log('未捞取的指定漂流瓶数量:', Number(data[0]));
-      console.log('调试消息:', data[1]);
-      console.log('使用的账户地址:', userAddress);
-    } catch (error) {
-      console.error('调试错误:', error);
-    }
-  };
-
-  // 修改调试函数
-  const debugUserTargeted = async () => {
-    try {
-      const result = await readContract({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'debugUserTargetedBottles',
-        args: [userAddress]
-      }) as [bigint[], boolean[], string[]];
-      
-      console.log('调试用户指定漂流瓶:', {
-        indices: result[0],
-        isPicked: result[1],
-        targetReceivers: result[2]
-      });
-      console.log('当前账户:', userAddress);
-    } catch (error) {
-      console.error('调试错误:', error);
-    }
-  };
-
-  // 修改调试函数
-  const debugBottleTarget = async (index: number) => {
-    try {
-      const result = await readContract({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'debugBottleTarget',
-        args: [index]
-      }) as [string, boolean, string];  // 添加类型断言
-      
-      console.log('漂流瓶目标信息:', {
-        bottleTarget: result[0],
-        isPicked: result[1],
-        currentUser: result[2]
-      } as BottleTargetResult);
-    } catch (error) {
-      console.error('调试错误:', error);
-    }
-  };
-
   return (
     <div className="pick-bottle">
       <h2>捞取漂流瓶</h2>
@@ -448,24 +294,6 @@ export default function PickBottle() {
             <span>时间: {new Date(Number(bottle.timestamp) * 1000).toLocaleString()}</span>
           </div>
         </div>
-      )}
-
-      {process.env.NODE_ENV === 'development' && (
-        <button onClick={debugBottles} style={{ marginTop: '20px' }}>
-          Debug Bottles
-        </button>
-      )}
-
-      {process.env.NODE_ENV === 'development' && (
-        <button onClick={debugTargetedBottles} style={{ marginTop: '20px' }}>
-          Debug Targeted Bottles
-        </button>
-      )}
-
-      {process.env.NODE_ENV === 'development' && (
-        <button onClick={debugUserTargeted} style={{ marginTop: '20px' }}>
-          Debug User Targeted
-        </button>
       )}
     </div>
   );
