@@ -1,46 +1,39 @@
-# Getting Started with Create React App
+# 区块链漂流瓶
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+一个基于区块链的 Web3 漂流瓶应用，让用户可以在区块链上传递信息和情感。
 
-## Available Scripts
+## 功能特点
 
-In the project directory, you can run:
+- 📝 投放漂流瓶：写下内容并发送到区块链
+  - 支持公开投放
+  - 支持指定接收者（内容会被加密）
+- 🎣 捞取漂流瓶
+  - 随机捞取他人的公开漂流瓶
+  - 查看专门发给自己的漂流瓶
+- 📜 历史记录：查看自己投放和捞取的漂流瓶历史
 
-### `npm start`
+## 技术栈
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- 前端：React + TypeScript
+- 智能合约：Solidity
+- Web3 交互：wagmi + viem
+- 区块链：Sepolia 测试网
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 合约信息
 
-### `npm test`
+- 网络：Sepolia 测试网
+- 合约地址：`0xac7f0df29dca546f30ed1bf8eac46a53fc41b7c4`
+- 功能：
+  - 支持内容加密
+  - 随机漂流瓶分配
+  - 定向投放功能
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 安全特性
 
-### `npm run build`
+- 使用 XOR 加密保护定向漂流瓶内容
+- 只有指定接收者可以解密内容
+- 完全去中心化的存储和交互
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 许可证
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+MIT

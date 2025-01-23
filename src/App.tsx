@@ -2,36 +2,16 @@ import React from 'react';
 import '@rainbow-me/rainbowkit/styles.css';
 import './styles/app.css';
 import {
-  getDefaultWallets,
   RainbowKitProvider,
   ConnectButton,
 } from '@rainbow-me/rainbowkit';
-import { WagmiConfig, createConfig, configureChains } from 'wagmi';
-import { mainnet, sepolia } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
+import { WagmiConfig } from 'wagmi';
+import { config, chains } from './wagmi.config';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import ThrowBottle from './pages/ThrowBottle';
 import PickBottle from './pages/PickBottle';
 import Profile from './pages/Profile';
-
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet, sepolia],
-  [publicProvider()]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: 'Web3 漂流瓶',
-  projectId: 'b8c64fa5b412e56e72ad38abebd7e9fd',
-  chains
-});
-
-const config = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-  webSocketPublicClient
-});
 
 function App() {
   return (
