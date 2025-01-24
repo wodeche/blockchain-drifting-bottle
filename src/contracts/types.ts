@@ -3,9 +3,10 @@ export interface Bottle {
   id: string;
   content: string;
   sender: string;
+  targetReceiver: string;
   timestamp: string;
   isPicked: boolean;
-  picker?: string;
+  picker: string;
 }
 
 // 合约事件类型

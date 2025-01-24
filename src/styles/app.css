@@ -328,4 +328,61 @@ nav {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.my-bottles {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.bottle-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.bottle-tabs button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.bottle-tabs button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.bottle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bottle-item {
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.bottle-content {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.bottle-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
+.no-bottles {
+  text-align: center;
+  color: #666;
+  padding: 20px;
 } 

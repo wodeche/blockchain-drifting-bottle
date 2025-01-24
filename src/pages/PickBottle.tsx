@@ -6,6 +6,7 @@ import { sepolia } from 'viem/chains';
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../contracts/config';
 import { Bottle } from '../contracts/types';
 import { useBottleStore } from '../hooks/useBottleStore';
+import { useBottleHistory } from '../hooks/useBottleHistory';
 
 // 创建公共客户端
 const publicClient = createPublicClient({
@@ -15,11 +16,14 @@ const publicClient = createPublicClient({
 
 // 修改事件数据类型
 interface BottlePickedEvent {
-  bottleId: string;
-  content: string;
-  sender: string;
-  timestamp: bigint;
-  picker: string;
+  eventName: 'BottlePicked';  // 明确指定事件名称
+  args: {
+    bottleId: string;
+    picker: string;
+    content: string;
+    sender: string;
+    timestamp: bigint;
+  };
 }
 
 interface DecodedEvent {
@@ -56,6 +60,7 @@ export default function PickBottle() {
   const [status, setStatus] = useState('');
 
   const setRefetchAvailable = useBottleStore((state) => state.setRefetchAvailable);
+  const addPickedBottle = useBottleHistory((state) => state.addPickedBottle);
 
   // 只保留一个账户获取
   const { address: userAddress } = useAccount();
@@ -145,36 +150,37 @@ export default function PickBottle() {
       try {
         console.log('交易确认成功');
         
-        // 从交易数据中获取漂流瓶内容
         const events = data.logs.map(log => {
           try {
-            return decodeEventLog({
+            const decodedLog = decodeEventLog({
               abi: CONTRACT_ABI,
               data: log.data,
               topics: log.topics,
-            }) as DecodedEvent;
+            }) as BottlePickedEvent;
+            
+            if (decodedLog.eventName === 'BottlePicked' && 'bottleId' in decodedLog.args) {
+              const bottle = {
+                id: decodedLog.args.bottleId,
+                content: decodedLog.args.content,
+                sender: decodedLog.args.sender,
+                targetReceiver: '0x0000000000000000000000000000000000000000',
+                timestamp: decodedLog.args.timestamp.toString(),
+                isPicked: true,
+                picker: decodedLog.args.picker
+              };
+              
+              addPickedBottle(bottle);
+              setBottle(bottle);  // 使用同一个对象更新状态
+              setStatus('成功捞取到漂流瓶！');
+            }
+            
+            return decodedLog;
           } catch (e) {
-            console.log('解码日志失败:', e);
             return null;
           }
-        }).filter((event): event is DecodedEvent => event !== null);
+        }).filter((event): event is BottlePickedEvent => event !== null);
         
         console.log('解码后的事件:', events);
-        
-        // 找到 BottlePicked 事件
-        const pickedEvent = events.find(e => e.eventName === 'BottlePicked');
-        if (pickedEvent) {
-          const bottleData = pickedEvent.args;
-          setBottle({
-            id: bottleData.bottleId,
-            content: bottleData.content,
-            sender: bottleData.sender,
-            timestamp: bottleData.timestamp.toString(),
-            isPicked: true,
-            picker: bottleData.picker
-          });
-          setStatus('成功捞取到漂流瓶！');
-        }
       } catch (error) {
         console.error('处理错误:', error);
         setStatus('获取漂流瓶内容失败');
@@ -187,42 +193,50 @@ export default function PickBottle() {
   const { isLoading: isWaitingTargeted } = useWaitForTransaction({
     hash: targetedPickData?.hash,
     onSuccess(data) {
-      setStatus('成功捞取到漂流瓶！');
-      // 获取捞取的漂流瓶内容
-      const events = data.logs.map(log => {
-        try {
-          const event = decodeEventLog({
-            abi: CONTRACT_ABI,
-            data: log.data,
-            topics: log.topics,
-          });
-          return event.args as unknown as BottlePickedEvent;
-        } catch (e) {
-          return null;
-        }
-      }).filter(Boolean);
-
-      console.log('Events:', events);
-      // 更新 UI 显示捞取的内容
-      if (events.length > 0 && events[0]) {
-        const bottleData = events[0];
-        setBottle({
-          id: bottleData.bottleId,
-          content: bottleData.content,
-          sender: bottleData.sender,
-          timestamp: bottleData.timestamp.toString(),
-          isPicked: true,
-          picker: bottleData.picker
-        });
-      }
-      setTimeout(() => setStatus(''), 3000);
-    },
-    onError(error) {
-      if (error.message.includes('could not be found')) {
-        setStatus('漂流瓶可能已经成功捞取，请查看链上记录');
+      try {
+        const events = data.logs.map(log => {
+          try {
+            const decodedLog = decodeEventLog({
+              abi: CONTRACT_ABI,
+              data: log.data,
+              topics: log.topics,
+            }) as BottlePickedEvent;
+            
+            if (decodedLog.eventName === 'BottlePicked' && 'bottleId' in decodedLog.args) {
+              const bottle = {
+                id: decodedLog.args.bottleId,
+                content: decodedLog.args.content,
+                sender: decodedLog.args.sender,
+                targetReceiver: '0x0000000000000000000000000000000000000000',
+                timestamp: decodedLog.args.timestamp.toString(),
+                isPicked: true,
+                picker: decodedLog.args.picker
+              };
+              
+              addPickedBottle(bottle);
+              setBottle(bottle);
+              setStatus('成功捞取到漂流瓶！');
+            }
+            
+            return decodedLog;
+          } catch (e) {
+            return null;
+          }
+        }).filter((event): event is BottlePickedEvent => event !== null);
+        
+        console.log('解码后的事件:', events);
         setTimeout(() => setStatus(''), 3000);
-      } else {
-        setStatus(`捞取失败: ${error.message}`);
+      } catch (error: unknown) {  // 明确指定错误类型
+        if (error instanceof Error) {  // 类型守卫
+          if (error.message.includes('could not be found')) {
+            setStatus('漂流瓶可能已经成功捞取，请查看链上记录');
+            setTimeout(() => setStatus(''), 3000);
+          } else {
+            setStatus(`捞取失败: ${error.message}`);
+          }
+        } else {
+          setStatus('捞取失败: 未知错误');
+        }
       }
     },
     confirmations: 1,
