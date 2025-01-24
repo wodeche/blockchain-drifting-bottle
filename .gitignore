@@ -40,3 +40,4 @@ yarn-error.log*
 # solidity-coverage
 /coverage
 /coverage.json
+.vercel
