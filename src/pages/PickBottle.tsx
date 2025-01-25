@@ -60,11 +60,11 @@ interface TargetedCountResult {
 // 创建一个漂流瓶数组来模拟多个漂流瓶
 const createBottleRows = (bottle: Bottle | null) => {
   if (!bottle) return { firstRow: [], secondRow: [] };
-  
+
   // 创建6个相同的漂流瓶来实现滚动效果
   const bottles = Array(6).fill(bottle);
   const midPoint = Math.ceil(bottles.length / 2);
-  
+
   return {
     firstRow: bottles.slice(0, midPoint),
     secondRow: bottles.slice(midPoint)
@@ -172,9 +172,9 @@ export default function PickBottle() {
   }) as { data: TargetedCountResult, refetch: () => void };
 
   // 随机捞取漂流瓶
-  const { 
+  const {
     data: randomPickData,
-    write: pickRandomBottle, 
+    write: pickRandomBottle,
     isLoading: isPickingRandom,
   } = useContractWrite({
     address: CONTRACT_ADDRESS,
@@ -189,9 +189,9 @@ export default function PickBottle() {
   });
 
   // 捞取指定给我的漂流瓶
-  const { 
+  const {
     data: targetedPickData,
-    write: pickTargetedBottle, 
+    write: pickTargetedBottle,
     isLoading: isPickingTargeted,
   } = useContractWrite({
     address: CONTRACT_ADDRESS,
@@ -217,7 +217,7 @@ export default function PickBottle() {
               data: log.data,
               topics: log.topics,
             }) as BottlePickedEvent;
-            
+
             if (decodedLog.eventName === 'BottlePicked' && 'bottleId' in decodedLog.args) {
               const bottle = {
                 id: decodedLog.args.bottleId,
@@ -228,21 +228,21 @@ export default function PickBottle() {
                 isPicked: true,
                 picker: decodedLog.args.picker
               };
-              
+
               addPickedBottle(bottle);
               setBottle(bottle);  // 设置当前捞到的瓶子
               setStatus('成功捞取到漂流瓶！');
-              
+
               // 触发烟花效果
               triggerFireworks();
             }
-            
+
             return decodedLog;
           } catch (e) {
             return null;
           }
         }).filter((event): event is BottlePickedEvent => event !== null);
-        
+
         console.log('解码后的事件:', events);
         setTimeout(() => setStatus(''), 3000);
       } catch (error: any) {
@@ -266,7 +266,7 @@ export default function PickBottle() {
               data: log.data,
               topics: log.topics,
             }) as BottlePickedEvent;
-            
+
             if (decodedLog.eventName === 'BottlePicked' && 'bottleId' in decodedLog.args) {
               const bottle = {
                 id: decodedLog.args.bottleId,
@@ -277,21 +277,21 @@ export default function PickBottle() {
                 isPicked: true,
                 picker: decodedLog.args.picker
               };
-              
+
               addPickedBottle(bottle);
               setBottle(bottle);
               setStatus('成功捞取到漂流瓶！');
-              
+
               // 在这里添加烟花效果
               triggerFireworks();
             }
-            
+
             return decodedLog;
           } catch (e) {
             return null;
           }
         }).filter((event): event is BottlePickedEvent => event !== null);
-        
+
         console.log('解码后的事件:', events);
         setTimeout(() => setStatus(''), 3000);
       } catch (error: unknown) {  // 明确指定错误类型
@@ -317,7 +317,7 @@ export default function PickBottle() {
     try {
       // 移除这里的立即触发
       // triggerFireworks();
-      
+
       if (pickingTargeted) {
         await pickTargetedBottle?.();
       } else {
@@ -352,7 +352,7 @@ export default function PickBottle() {
 
         <div className="space-y-6">
           <div className="flex gap-4 justify-center">
-            <button 
+            <button
               onClick={() => {
                 setPickingTargeted(false);
                 handlePickBottle();
@@ -380,7 +380,7 @@ export default function PickBottle() {
                 )}
               </span>
             </button>
-            <button 
+            <button
               onClick={() => {
                 setPickingTargeted(true);
                 handlePickBottle();
