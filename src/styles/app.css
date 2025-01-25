@@ -6,6 +6,8 @@
   --border-color: #dadce0;
   --hover-color: #f1f3f4;
   --text-color: #202124;
+  --background: 0 0% 100%;
+  --foreground: 222.2 47.4% 11.2%;
 }
 
 body {
@@ -385,4 +387,61 @@ nav {
   text-align: center;
   color: #666;
   padding: 20px;
+}
+
+/* Marquee 动画样式 */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+/* 悬停时暂停动画 */
+.hover\:pause-animation:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* 渐变遮罩效果 */
+.gradient-mask-l,
+.gradient-mask-r {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 150px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.gradient-mask-l {
+  left: 0;
+  background: linear-gradient(to right, white 10%, transparent);
+}
+
+.gradient-mask-r {
+  right: 0;
+  background: linear-gradient(to left, white 10%, transparent);
+}
+
+/* 背景和暗色模式支持 */
+.dark {
+  --background: 224 71% 4%;
+  --foreground: 213 31% 91%;
+}
+
+.bg-background {
+  background-color: hsl(var(--background));
+}
+
+/* 渐变背景效果 */
+.from-background {
+  --tw-gradient-from: hsl(var(--background));
+  --tw-gradient-to: hsl(var(--background) / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 } 

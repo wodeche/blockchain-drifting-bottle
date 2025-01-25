@@ -7,6 +7,9 @@ import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../contracts/config';
 import { Bottle } from '../contracts/types';
 import { useBottleStore } from '../hooks/useBottleStore';
 import { useBottleHistory } from '../hooks/useBottleHistory';
+import { Marquee } from '../components/magicui/marquee';
+import { cn } from '../utils/cn';
+import confetti from "canvas-confetti";
 
 // 创建公共客户端
 const publicClient = createPublicClient({
@@ -53,6 +56,41 @@ interface TargetedCountResult {
   0: bigint;
   1: string[];
 }
+
+// 创建一个漂流瓶数组来模拟多个漂流瓶
+const createBottleRows = (bottle: Bottle | null) => {
+  if (!bottle) return { firstRow: [], secondRow: [] };
+  
+  // 创建6个相同的漂流瓶来实现滚动效果
+  const bottles = Array(6).fill(bottle);
+  const midPoint = Math.ceil(bottles.length / 2);
+  
+  return {
+    firstRow: bottles.slice(0, midPoint),
+    secondRow: bottles.slice(midPoint)
+  };
+};
+
+const BottleCard = ({ bottle }: { bottle: Bottle }) => {
+  return (
+    <figure className="relative min-w-[300px] flex-shrink-0 cursor-pointer overflow-hidden rounded-xl border p-4 mx-4 bg-white hover:shadow-lg transition-all duration-300">
+      <div className="flex flex-col">
+        <div className="flex flex-row items-center gap-2 mb-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-500" />
+          <div className="flex flex-col">
+            <p className="text-sm font-medium">
+              {bottle.sender.slice(0, 6)}...{bottle.sender.slice(-4)}
+            </p>
+            <p className="text-xs text-gray-500">
+              {new Date(Number(bottle.timestamp) * 1000).toLocaleString()}
+            </p>
+          </div>
+        </div>
+        <blockquote className="mt-2 text-sm leading-relaxed">{bottle.content}</blockquote>
+      </div>
+    </figure>
+  );
+};
 
 export default function PickBottle() {
   const [pickingTargeted, setPickingTargeted] = useState(false);
@@ -146,10 +184,9 @@ export default function PickBottle() {
 
   const { isLoading: isWaitingRandom } = useWaitForTransaction({
     hash: randomPickData?.hash,
-    onSuccess(data) {
+    onSuccess: async (data) => {
       try {
-        console.log('交易确认成功');
-        
+        // 解析事件日志
         const events = data.logs.map(log => {
           try {
             const decodedLog = decodeEventLog({
@@ -170,8 +207,11 @@ export default function PickBottle() {
               };
               
               addPickedBottle(bottle);
-              setBottle(bottle);  // 使用同一个对象更新状态
+              setBottle(bottle);  // 设置当前捞到的瓶子
               setStatus('成功捞取到漂流瓶！');
+              
+              // 触发烟花效果
+              triggerFireworks();
             }
             
             return decodedLog;
@@ -181,13 +221,15 @@ export default function PickBottle() {
         }).filter((event): event is BottlePickedEvent => event !== null);
         
         console.log('解码后的事件:', events);
-      } catch (error) {
-        console.error('处理错误:', error);
-        setStatus('获取漂流瓶内容失败');
+        setTimeout(() => setStatus(''), 3000);
+      } catch (error: any) {
+        console.error('Error processing transaction:', error);
+        setStatus(`处理交易失败: ${error.message}`);
       }
     },
-    confirmations: 1,
-    timeout: 30000
+    onError(error) {
+      setStatus(`交易失败: ${error.message}`);
+    }
   });
 
   const { isLoading: isWaitingTargeted } = useWaitForTransaction({
@@ -216,6 +258,9 @@ export default function PickBottle() {
               addPickedBottle(bottle);
               setBottle(bottle);
               setStatus('成功捞取到漂流瓶！');
+              
+              // 在这里添加烟花效果
+              triggerFireworks();
             }
             
             return decodedLog;
@@ -245,8 +290,61 @@ export default function PickBottle() {
 
   const isLoading = isPickingRandom || isWaitingRandom || isPickingTargeted || isWaitingTargeted;
 
+  // 添加 fireworks 效果函数
+  const triggerFireworks = () => {
+    const scalar = 2;
+    const heart = confetti.shapeFromText({ text: "❤️", scalar });
+    const sparkles = confetti.shapeFromText({ text: "✨", scalar });
+
+    const defaults = {
+      spread: 360,
+      ticks: 60,
+      gravity: 0,
+      decay: 0.96,
+      startVelocity: 20,
+      shapes: [heart, sparkles],
+      scalar,
+    };
+
+    // 一次完整的烟花展示
+    const shootFirework = (delay: number) => {
+      setTimeout(() => {
+        // 发射爱心
+        confetti({
+          ...defaults,
+          particleCount: 30,
+          origin: { x: 0.3, y: 0.5 }
+        });
+
+        // 发射闪光
+        confetti({
+          ...defaults,
+          particleCount: 30,
+          origin: { x: 0.7, y: 0.5 }
+        });
+
+        // 发射圆形粒子
+        confetti({
+          ...defaults,
+          particleCount: 15,
+          scalar: scalar / 2,
+          shapes: ["circle"],
+          origin: { x: 0.5, y: 0.5 }
+        });
+      }, delay);
+    };
+
+    // 连续发射三次，每次间隔 800ms
+    shootFirework(0);    // 第一次
+    shootFirework(800);  // 第二次
+    shootFirework(1600); // 第三次
+  };
+
   const handlePickBottle = async () => {
     try {
+      // 移除这里的立即触发
+      // triggerFireworks();
+      
       if (pickingTargeted) {
         await pickTargetedBottle?.();
       } else {
@@ -299,14 +397,10 @@ export default function PickBottle() {
         )}
       </div>
 
-      {/* 显示捞取结果 */}
+      {/* 漂流瓶展示区域 */}
       {bottle && (
-        <div className="bottle-content">
-          <p className="bottle-text">{bottle.content}</p>
-          <div className="bottle-info">
-            <span>来自: {bottle.sender}</span>
-            <span>时间: {new Date(Number(bottle.timestamp) * 1000).toLocaleString()}</span>
-          </div>
+        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg border bg-white mt-6 p-6">
+          <BottleCard bottle={bottle} />
         </div>
       )}
     </div>
