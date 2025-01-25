@@ -73,23 +73,46 @@ const createBottleRows = (bottle: Bottle | null) => {
 
 const BottleCard = ({ bottle }: { bottle: Bottle }) => {
   return (
-    <figure className="relative min-w-[300px] flex-shrink-0 cursor-pointer overflow-hidden rounded-xl border p-4 mx-4 bg-white hover:shadow-lg transition-all duration-300">
-      <div className="flex flex-col">
-        <div className="flex flex-row items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-500" />
-          <div className="flex flex-col">
-            <p className="text-sm font-medium">
-              {bottle.sender.slice(0, 6)}...{bottle.sender.slice(-4)}
-            </p>
-            <p className="text-xs text-gray-500">
-              {new Date(Number(bottle.timestamp) * 1000).toLocaleString()}
-            </p>
+    <figure className="relative min-w-[300px] mx-4 group">
+      <div className="absolute -inset-1 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
+      <div className="relative p-4 bg-white rounded-lg border border-pink-100/50 hover:shadow-lg transition-all duration-300">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-400 to-purple-400"></div>
+            <div className="flex flex-col">
+              <p className="text-sm font-medium text-gray-700">
+                {bottle.sender.slice(0, 6)}...{bottle.sender.slice(-4)}
+              </p>
+              <p className="text-xs text-gray-400">
+                {new Date(Number(bottle.timestamp) * 1000).toLocaleString()}
+              </p>
+            </div>
           </div>
+          <blockquote className="mt-2 text-sm leading-relaxed text-gray-600">
+            {bottle.content}
+          </blockquote>
         </div>
-        <blockquote className="mt-2 text-sm leading-relaxed">{bottle.content}</blockquote>
       </div>
     </figure>
   );
+};
+
+// 添加烟花效果函数
+const shootFirework = (delay: number) => {
+  setTimeout(() => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#FF8BA7', '#93E4C1', '#FFDDA1', '#C3B1E1']
+    });
+  }, delay);
+};
+
+const triggerFireworks = () => {
+  shootFirework(0);    // 第一次
+  shootFirework(800);  // 第二次
+  shootFirework(1600); // 第三次
 };
 
 export default function PickBottle() {
@@ -290,56 +313,6 @@ export default function PickBottle() {
 
   const isLoading = isPickingRandom || isWaitingRandom || isPickingTargeted || isWaitingTargeted;
 
-  // 添加 fireworks 效果函数
-  const triggerFireworks = () => {
-    const scalar = 2;
-    const heart = confetti.shapeFromText({ text: "❤️", scalar });
-    const sparkles = confetti.shapeFromText({ text: "✨", scalar });
-
-    const defaults = {
-      spread: 360,
-      ticks: 60,
-      gravity: 0,
-      decay: 0.96,
-      startVelocity: 20,
-      shapes: [heart, sparkles],
-      scalar,
-    };
-
-    // 一次完整的烟花展示
-    const shootFirework = (delay: number) => {
-      setTimeout(() => {
-        // 发射爱心
-        confetti({
-          ...defaults,
-          particleCount: 30,
-          origin: { x: 0.3, y: 0.5 }
-        });
-
-        // 发射闪光
-        confetti({
-          ...defaults,
-          particleCount: 30,
-          origin: { x: 0.7, y: 0.5 }
-        });
-
-        // 发射圆形粒子
-        confetti({
-          ...defaults,
-          particleCount: 15,
-          scalar: scalar / 2,
-          shapes: ["circle"],
-          origin: { x: 0.5, y: 0.5 }
-        });
-      }, delay);
-    };
-
-    // 连续发射三次，每次间隔 800ms
-    shootFirework(0);    // 第一次
-    shootFirework(800);  // 第二次
-    shootFirework(1600); // 第三次
-  };
-
   const handlePickBottle = async () => {
     try {
       // 移除这里的立即触发
@@ -357,52 +330,121 @@ export default function PickBottle() {
   };
 
   return (
-    <div className="pick-bottle">
-      <h2>捞取漂流瓶</h2>
-      
-      {status && (
-        <div className={`status-message ${status.includes('失败') ? 'error' : 'success'}`}>
-          {status}
+    <div className="max-w-2xl mx-auto px-4">
+      <div className="cute-card p-8">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-purple-500 mb-4">
+            🎣 捞取漂流瓶
+          </h2>
+          <p className="text-gray-500 text-sm">
+            每个漂流瓶都藏着一份独特的心意，等待被发现 ✨
+          </p>
         </div>
-      )}
-      
-      <div className="pick-options">
-        <button 
-          onClick={() => setPickingTargeted(false)}
-          className={!pickingTargeted ? 'active' : ''}
-        >
-          随机捞取 ({Number(availableCount || 0)})
-        </button>
-        <button 
-          onClick={() => setPickingTargeted(true)}
-          className={pickingTargeted ? 'active' : ''}
-        >
-          捞取指定给我的 ({targetedCount ? Number(targetedCount[0]) : 0})
-        </button>
+
+        {status && (
+          <div className={cn(
+            "text-center p-3 rounded-lg mb-6",
+            status.includes('失败') ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-500'
+          )}>
+            {status}
+          </div>
+        )}
+
+        <div className="space-y-6">
+          <div className="flex gap-4 justify-center">
+            <button 
+              onClick={() => {
+                setPickingTargeted(false);
+                handlePickBottle();
+              }}
+              disabled={isLoading || !Number(availableCount)}
+              className={cn(
+                "cute-button group relative flex-1",
+                "transform transition-all duration-300",
+                isLoading && "opacity-70 cursor-not-allowed",
+                !isLoading && "hover:scale-105",
+                !pickingTargeted && "bg-gradient-to-r from-pink-400 to-pink-500"
+              )}
+            >
+              <span className="relative z-10 flex items-center justify-center">
+                {isLoading && !pickingTargeted ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    捞取中...
+                  </>
+                ) : (
+                  <>随机捞取 🎣 ({Number(availableCount || 0)})</>
+                )}
+              </span>
+            </button>
+            <button 
+              onClick={() => {
+                setPickingTargeted(true);
+                handlePickBottle();
+              }}
+              disabled={isLoading || !(targetedCount && Number(targetedCount[0]))}
+              className={cn(
+                "cute-button group relative flex-1",
+                "transform transition-all duration-300",
+                isLoading && "opacity-70 cursor-not-allowed",
+                !isLoading && "hover:scale-105",
+                pickingTargeted && "bg-gradient-to-r from-purple-400 to-purple-500"
+              )}
+            >
+              <span className="relative z-10 flex items-center justify-center">
+                {isLoading && pickingTargeted ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    捞取中...
+                  </>
+                ) : (
+                  <>捞取指定给我的 💌 ({targetedCount ? Number(targetedCount[0]) : 0})</>
+                )}
+              </span>
+            </button>
+          </div>
+
+          {!pickingTargeted && (!availableCount || Number(availableCount) === 0) && (
+            <p className="text-center text-gray-500 py-4 bg-pink-50/50 rounded-lg border-2 border-dashed border-pink-200">
+              目前海面上没有漂流瓶 🌊
+            </p>
+          )}
+          {pickingTargeted && (!targetedCount || Number(targetedCount[0]) === 0) && (
+            <p className="text-center text-gray-500 py-4 bg-purple-50/50 rounded-lg border-2 border-dashed border-purple-200">
+              没有指定给你的漂流瓶 💌
+            </p>
+          )}
+        </div>
+
+        {/* 漂流瓶展示区域 */}
+        {bottle && (
+          <div className="relative mt-8 transform transition-all duration-500 hover:scale-105">
+            <div className="absolute -inset-1 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg blur opacity-25"></div>
+            <div className="relative p-6 bg-white rounded-lg border border-pink-100/50">
+              <BottleCard bottle={bottle} />
+            </div>
+          </div>
+        )}
+
+        {/* 装饰元素 */}
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+          <div className="absolute top-4 left-4 w-2 h-2 bg-pink-200 rounded-full animate-ping"></div>
+          <div className="absolute bottom-4 right-4 w-2 h-2 bg-purple-200 rounded-full animate-ping delay-300"></div>
+          <div className="absolute top-1/2 right-4 w-2 h-2 bg-yellow-200 rounded-full animate-ping delay-700"></div>
+        </div>
       </div>
 
-      <div className="pick-action">
-        <button 
-          onClick={handlePickBottle}
-          disabled={isLoading || 
-            (pickingTargeted ? !(targetedCount && Number(targetedCount[0])) : !Number(availableCount))}
-        >
-          {isLoading ? '捞取中...' : '捞取漂流瓶'}
-        </button>
-        {!pickingTargeted && (!availableCount || Number(availableCount) === 0) && (
-          <p className="error-message">目前没有可以捞取的漂流瓶</p>
-        )}
-        {pickingTargeted && (!targetedCount || Number(targetedCount[0]) === 0) && (
-          <p className="error-message">没有指定给你的漂流瓶</p>
-        )}
+      {/* 提示信息 */}
+      <div className="mt-8 text-center text-sm text-gray-500 space-y-2">
+        <p>💝 每个漂流瓶都承载着独特的故事</p>
+        <p>✨ 让我们在区块链上发现更多惊喜</p>
       </div>
-
-      {/* 漂流瓶展示区域 */}
-      {bottle && (
-        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg border bg-white mt-6 p-6">
-          <BottleCard bottle={bottle} />
-        </div>
-      )}
     </div>
   );
 } 

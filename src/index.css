@@ -2,120 +2,180 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
- 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
- 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
- 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
- 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
- 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
- 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
- 
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --ring: 215 20.2% 65.1%;
- 
-    --radius: 0.5rem;
-  }
- 
-  .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
- 
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
- 
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
- 
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
- 
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
- 
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
- 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
- 
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --ring: 216 34% 17%;
- 
-    --radius: 0.5rem;
-  }
-}
- 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
+:root {
+  --color-pink: #FF8BA7;
+  --color-mint: #93E4C1;
+  --color-yellow: #FFDDA1;
+  --color-purple: #C3B1E1;
 }
 
-/* 保留原有的动画样式 */
-@keyframes marquee {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.animate-marquee {
-  animation: marquee 20s linear infinite;
+@keyframes shine {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
 }
 
-.hover\:pause-animation:hover .animate-marquee {
-  animation-play-state: paused;
+.gradient-text {
+  background: linear-gradient(90deg, var(--color-pink), var(--color-mint), var(--color-yellow));
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shine 3s linear infinite;
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #a8e6ff;
+  background-image: 
+    /* 波浪型浪花 - 第一层 */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath fill='rgba(255,255,255,0.8)' d='M0,0 C150,60 300,0 450,60 C600,120 750,60 900,60 C1050,60 1200,120 1200,60 L1200,0 L0,0 Z'%3E%3C/path%3E%3C/svg%3E"),
+    /* 波浪型浪花 - 第二层 */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath fill='rgba(255,255,255,0.5)' d='M0,60 C150,0 300,60 450,0 C600,0 750,60 900,0 C1050,0 1200,60 1200,0 L1200,120 L0,120 Z'%3E%3C/path%3E%3C/svg%3E"),
+    /* 渐变海面 */
+    linear-gradient(
+      45deg,
+      #7cd7ff 0%,
+      #a8e6ff 50%,
+      #7cd7ff 100%
+    );
+  background-size: 
+    400px 40px,
+    400px 40px,
+    100% 100%;
+  background-position: 
+    0 20px,
+    0 40px,
+    0 0;
+  animation: wave 10s linear infinite;
 }
 
-.App {
-  text-align: center;
-  padding: 20px;
+@keyframes wave {
+  0% {
+    background-position: 
+      0 20px,
+      0 40px,
+      0 0;
+  }
+  100% {
+    background-position: 
+      400px 20px,
+      400px 40px,
+      0 0;
+  }
 }
 
-.App-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  font-size: calc(10px + 2vmin);
+.cute-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(255, 139, 167, 0.1);
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cute-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 36px rgba(255, 139, 167, 0.15);
+}
+
+.cute-button {
+  background: linear-gradient(45deg, var(--color-pink), var(--color-purple));
+  color: white;
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 15px rgba(255, 139, 167, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.cute-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 139, 167, 0.3);
+}
+
+.cute-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cute-button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transform: rotate(45deg);
+  transition: all 0.3s ease;
+}
+
+.cute-button:hover::after {
+  transform: rotate(45deg) translate(50%, 50%);
+}
+
+.cute-input {
+  border: 2px solid var(--color-pink);
+  border-radius: 15px;
+  padding: 12px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.cute-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 139, 167, 0.2);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% - 1rem)); }
+}
+
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(-100% - 1rem)); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical 40s linear infinite;
+}
+
+/* 添加一些响应式调整 */
+@media (max-width: 640px) {
+  .cute-card {
+    padding: 16px;
+  }
+
+  .gradient-text {
+    font-size: 1.875rem;
+  }
 }
