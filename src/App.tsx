@@ -22,7 +22,9 @@ function App() {
           <div className="App">
             <header className="App-header">
               <nav>
-                <Link to="/" className="logo">Web3 漂流瓶</Link>
+                <Link to="/" className="text-2xl font-bold text-pink-500 hover:opacity-80 transition-opacity">
+                  🧧 新年漂流瓶
+                </Link>
                 <div className="nav-links">
                   <Link to="/throw">投放漂流瓶</Link>
                   <Link to="/pick">捞取漂流瓶</Link>
