@@ -7,11 +7,11 @@ export default function Home() {
     <div className="max-w-2xl mx-auto px-4">
       <div className="cute-card p-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-pink-500 mb-4">
-            🧧 新年漂流瓶
+          <h1 className="text-4xl font-bold mb-4 page-title">
+            新年漂流瓶
           </h1>
-          <p className="text-gray-500">
-            在区块链上传递新年祝福，发现惊喜 ✨
+          <p className="page-subtitle">
+            在区块链上传递新年祝福，发现惊喜
           </p>
         </div>
 

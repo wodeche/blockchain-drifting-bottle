@@ -22,13 +22,28 @@ function App() {
           <div className="App">
             <header className="App-header">
               <nav>
-                <Link to="/" className="text-2xl font-bold text-pink-500 hover:opacity-80 transition-opacity">
-                  🧧 新年漂流瓶
+                <Link to="/" className="text-2xl font-bold text-black hover:opacity-80 transition-opacity">
+                  新年漂流瓶
                 </Link>
-                <div className="nav-links">
-                  <Link to="/throw">投放漂流瓶</Link>
-                  <Link to="/pick">捞取漂流瓶</Link>
-                  <Link to="/my-bottles">我的漂流瓶</Link>
+                <div className="nav-links flex gap-6">
+                  <Link 
+                    to="/throw" 
+                    className="text-lg font-bold text-black hover:opacity-80 transition-opacity"
+                  >
+                    投放漂流瓶
+                  </Link>
+                  <Link 
+                    to="/pick" 
+                    className="text-lg font-bold text-black hover:opacity-80 transition-opacity"
+                  >
+                    捞取漂流瓶
+                  </Link>
+                  <Link 
+                    to="/my-bottles" 
+                    className="text-lg font-bold text-black hover:opacity-80 transition-opacity"
+                  >
+                    我的漂流瓶
+                  </Link>
                 </div>
                 <ConnectButton />
               </nav>

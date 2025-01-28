@@ -313,18 +313,25 @@ export default function PickBottle() {
 
   const isLoading = isPickingRandom || isWaitingRandom || isPickingTargeted || isWaitingTargeted;
 
-  const handlePickBottle = async () => {
+  // 分开定义两个处理函数
+  const handlePickRandom = async () => {
     try {
-      // 移除这里的立即触发
-      // triggerFireworks();
-
-      if (pickingTargeted) {
-        await pickTargetedBottle?.();
-      } else {
-        await pickRandomBottle?.();
-      }
+      setPickingTargeted(false);
+      await pickRandomBottle?.();
+      await refetchAvailable();
     } catch (error: any) {
-      console.error('Error picking bottle:', error);
+      console.error('Error picking random bottle:', error);
+      setStatus(`捞取失败: ${error.message}`);
+    }
+  };
+
+  const handlePickTargeted = async () => {
+    try {
+      setPickingTargeted(true);
+      await pickTargetedBottle?.();
+      await refetchTargetedCount?.();
+    } catch (error: any) {
+      console.error('Error picking targeted bottle:', error);
       setStatus(`捞取失败: ${error.message}`);
     }
   };
@@ -333,11 +340,11 @@ export default function PickBottle() {
     <div className="max-w-2xl mx-auto px-4">
       <div className="cute-card p-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-purple-500 mb-4">
-            🎣 捞取漂流瓶
+          <h2 className="text-3xl font-bold mb-4 page-title">
+            捞取漂流瓶
           </h2>
-          <p className="text-gray-500 text-sm">
-            每个漂流瓶都藏着一份独特的心意，等待被发现 ✨
+          <p className="page-subtitle">
+            每个漂流瓶都藏着一份独特的心意，等待被发现
           </p>
         </div>
 
@@ -353,10 +360,7 @@ export default function PickBottle() {
         <div className="space-y-6">
           <div className="flex gap-4 justify-center">
             <button
-              onClick={() => {
-                setPickingTargeted(false);
-                handlePickBottle();
-              }}
+              onClick={handlePickRandom}
               disabled={isLoading || !Number(availableCount)}
               className={cn(
                 "cute-button group relative flex-1",
@@ -376,15 +380,12 @@ export default function PickBottle() {
                     捞取中...
                   </>
                 ) : (
-                  <>随机捞取 🎣 ({Number(availableCount || 0)})</>
+                  <>随机捞取 ({Number(availableCount || 0)})</>
                 )}
               </span>
             </button>
             <button
-              onClick={() => {
-                setPickingTargeted(true);
-                handlePickBottle();
-              }}
+              onClick={handlePickTargeted}
               disabled={isLoading || !(targetedCount && Number(targetedCount[0]))}
               className={cn(
                 "cute-button group relative flex-1",
@@ -404,7 +405,7 @@ export default function PickBottle() {
                     捞取中...
                   </>
                 ) : (
-                  <>捞取指定给我的 💌 ({targetedCount ? Number(targetedCount[0]) : 0})</>
+                  <>捞取指定给我的 ({targetedCount ? Number(targetedCount[0]) : 0})</>
                 )}
               </span>
             </button>

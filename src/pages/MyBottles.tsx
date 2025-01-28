@@ -67,11 +67,11 @@ export default function MyBottles() {
     <div className="max-w-2xl mx-auto px-4">
       <div className="cute-card p-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-pink-500 mb-4">
-            🧴 我的漂流瓶
+          <h2 className="text-3xl font-bold mb-4 page-title">
+            我的漂流瓶
           </h2>
-          <p className="text-gray-500 text-sm">
-            这里收藏着你投放的心意和收获的惊喜 ✨
+          <p className="page-subtitle">
+            这里收藏着你投放的心意和收获的惊喜
           </p>
         </div>
 
@@ -103,12 +103,12 @@ export default function MyBottles() {
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-purple-500 mb-4 flex items-center">
+            <h3 className="text-xl font-semibold text-[#4A90E2] mb-4 flex items-center">
               <span className="mr-2">📥</span>
               我捞取的漂流瓶 ({myPickedBottles.length})
             </h3>
             {myPickedBottles.length > 0 ? (
-              <div className="relative overflow-hidden rounded-lg border-2 border-purple-100 bg-white/90 backdrop-blur-sm">
+              <div className="relative overflow-hidden rounded-lg border-2 border-[#4A90E2]/20 bg-white/90 backdrop-blur-sm">
                 <Marquee 
                   reverse
                   pauseOnHover 
@@ -123,7 +123,7 @@ export default function MyBottles() {
                 <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white/90"></div>
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8 bg-purple-50/50 rounded-lg border-2 border-dashed border-purple-200">
+              <p className="text-center text-gray-500 py-8 bg-[#4A90E2]/5 rounded-lg border-2 border-dashed border-[#4A90E2]/20">
                 还没有捞取过漂流瓶 🌊
               </p>
             )}
@@ -133,7 +133,7 @@ export default function MyBottles() {
         {/* 装饰元素 */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
           <div className="absolute top-4 left-4 w-2 h-2 bg-pink-200 rounded-full animate-ping"></div>
-          <div className="absolute bottom-4 right-4 w-2 h-2 bg-purple-200 rounded-full animate-ping delay-300"></div>
+          <div className="absolute bottom-4 right-4 w-2 h-2 bg-[#4A90E2] rounded-full animate-ping delay-300"></div>
           <div className="absolute top-1/2 right-4 w-2 h-2 bg-yellow-200 rounded-full animate-ping delay-700"></div>
         </div>
       </div>

@@ -95,11 +95,11 @@ export default function ThrowBottle() {
         isThrown && "translate-y-[100vh] rotate-12 opacity-0"
       )}>
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-pink-500 mb-4">
-            ✍️ 写下你的心意
+          <h2 className="text-3xl font-bold mb-4 page-title">
+            写下你的心意
           </h2>
-          <p className="text-gray-500 text-sm">
-            让你的文字漂向远方，带给他人温暖与惊喜 💝
+          <p className="page-subtitle">
+            让你的文字漂向远方，带给他人温暖与惊喜
           </p>
         </div>
 
@@ -163,9 +163,9 @@ export default function ThrowBottle() {
                     正在投放...
                   </>
                 ) : isThrown ? (
-                  '漂流瓶已发送 ✨'
+                  '漂流瓶已发送'
                 ) : (
-                  <>投放漂流瓶 🌊</>
+                  '投放漂流瓶'
                 )}
               </span>
             </button>
